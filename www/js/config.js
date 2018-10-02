@@ -7,7 +7,7 @@ const STATUS = {
   //ドラ表示中
   READY: 1,
   //配牌中
-  
+
   //リー牌中
   //ターン開始
   DEALING: 2,
@@ -22,7 +22,8 @@ const STATUS = {
   //確定して手牌リー牌中
   //和了
   FINISH: 7,
-  
+  //流局
+  RYUKYOKU: 8
 };
 
 const IMAGE_WIDTH = 66;
@@ -34,4 +35,4 @@ const CANVAS_HEIGHT = 920;
 const CENTER_X = 320;
 const CENTER_Y = 320;
 var drawing_count = 0;
-const CARD_SPEED = 5;
+const CARD_SPEED = 15;

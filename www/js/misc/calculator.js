@@ -1,5 +1,5 @@
 //点数取得
-var calc = (hands) => {
+const calc = (idx, hands) => {
   var cards = hands.concat();
   var result = {
     detail: [],
@@ -28,7 +28,7 @@ var calc = (hands) => {
   }
 
   //表示ドラ加算
-  let dora = cards.filter(x => Number(x.data) === Number(BB.dora.data)).length;
+  let dora = cards.filter(x => Number(x.data) === Number(deck.dora.data)).length;
   if (Number(dora) > 0) {
     result.score += Number(dora);
     result.detail.push("ドラ:" + Number(dora) + "点");
@@ -84,6 +84,10 @@ var calc = (hands) => {
       break;
     default:
       break;
+  }
+  if (idx == PM.currentIdx) {
+    result.detail.push("親:2点");
+    result.score += 2;
   }
   return result;
 }

@@ -6,26 +6,22 @@ var BB = null;
 var PM = null;
 const exec = {
   init: new InitExecuter(),
-  finish: new FinishExecuter()
+  finish: new FinishDirector()
 }
 window.onload = function () {
   if (getUa() === false) init();
   else document.addEventListener("deviceready", init, false);
 }
 
+
 var init = () => {
-  BB = new DrawManager();
-  BB.init();
-  BB.reset();
+  PD = new PixiDirector();
   PM = new PlayerManager();
-  PM.init();
   state = STATUS.INIT;
   deck = new Deck();
-  console.log("PM.init");
-  //deck.init();
-  deck.shuffle();
-  BB.renderer.render(BB.stage);   // 描画する
+  deck.init();
   requestAnimFrame(update);
+  PD.renderer.render(PD.stage);   // 描画する
 }
 
 
@@ -34,7 +30,7 @@ var vote = 0;
 var finisher = [];
 //捨牌
 var waste = null;
-
+let dialog = null;
 
 var update = (time) => {
   var deltaTime = 0;
@@ -43,7 +39,7 @@ var update = (time) => {
   }
   lastTime = time;
 
-  BB.move(deltaTime);
+  PD.update(deltaTime);
 
   switch (state) {
     case STATUS.INIT:
@@ -56,13 +52,14 @@ var update = (time) => {
         doDealing();
       } else {
         console.log("流局");
-        exec.init.init();
-        state = STATUS.INIT;
+        dialog = new PixiDialogOK("流局");
+        dialog.show();
+        state = STATUS.RYUKYOKU;
       }
       break;
     case STATUS.TSUMO:
       //ツモ
-      if (BB.hasMoved()) {
+      if (PD.hasMoved()) {
         PM.current().start2Select();
         state = STATUS.SELECTING;
       }
@@ -71,6 +68,7 @@ var update = (time) => {
       if (PM.current().turn()) {
         if (PM.current().isDone()) {
           //積もったのでFinish
+          exec.finish.init();
           state = STATUS.FINISH;
         } else {
           state = STATUS.SELECTED;
@@ -89,9 +87,11 @@ var update = (time) => {
       //捨牌を見て行動決定中
       if (vote >= PLAYER_NUM - 1) {
         if (PM.isdone()) {
+          //誰かが上がっていた場合
           exec.finish.init();
           state = STATUS.FINISH;
         } else {
+          //誰も上がっていない場合次へ
           PM.current().sort();
           PM.step();
           state = STATUS.DEALING;
@@ -105,11 +105,18 @@ var update = (time) => {
         state = STATUS.INIT;
       }
       break;
+    case STATUS.RYUKYOKU:
+      //OK承認待ち
+      if (dialog.dialogResult == PixiDialogOK.DialogOK) {
+        exec.init.init();
+        state = STATUS.INIT;
+      }
+      break;
     default:
       break;
   }
   requestAnimFrame(update);
-  BB.renderer.render(BB.stage);   // 描画する
+  PD.renderer.render(PD.stage);   // 描画する
 }
 
 
@@ -120,7 +127,7 @@ var doDealing = () => {
 
 var doSelected = () => {
   var result = false;
-  if (BB.hasMoved()) {
+  if (PD.hasMoved()) {
     vote = 0;
     finisher = [];
     for (let p of PM.others()) {

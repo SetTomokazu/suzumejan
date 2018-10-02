@@ -2,16 +2,20 @@ class Deck {
   constructor() {
     this.deck = [];
     this.current = 0;
+    this.dora = null;
   }
 
   init() {
+    //表示していた牌を消す
+    for (let d of this.deck) {
+      d.hide();
+    }
     this.deck = [];
     let first_pos = { x: CENTER_X + 0.55 * IMAGE_WIDTH * IMAGE_SCALE, y: CENTER_Y };
     for (let t of Base) {
-      var p = new Pai();
-      p.setCard(t);
+      var p = new PixiPai(t);
       p.setPosition(first_pos);
-      p.setSize(IMAGE_WIDTH * IMAGE_SCALE, IMAGE_HEIGHT * IMAGE_SCALE);
+      p.setSize({ w: IMAGE_WIDTH * IMAGE_SCALE, h: IMAGE_HEIGHT * IMAGE_SCALE });
       p.show();
       this.deck.push(p);
     }
@@ -20,22 +24,6 @@ class Deck {
       let tmp = this.deck[i];
       this.deck[i] = this.deck[r];
       this.deck[r] = tmp;
-    }
-  }
-
-  shuffle() {
-    var tmp = Base.concat();
-
-    var selected = new Array(tmp.length).fill(tmp.length);
-    var i = 0;
-    console.log("shuffle start");
-    for (let d in tmp) {
-      do {
-        i = Math.floor(Math.random() * tmp.length);
-      } while (selected.some(s => s == i));
-      selected[d] = i;
-      var card = BB.addBlock(CENTER_X + 0.55 * IMAGE_WIDTH * IMAGE_SCALE, CENTER_Y, 0, tmp[i], false);
-      this.deck.push(card);
     }
     this.current = 0;
   }

@@ -1,6 +1,6 @@
 // This is a JavaScript file
 
-class Button extends Label {
+class Button extends PixiLabel {
   constructor() {
     this.view = new PIXI.Text(word, { font: "36px/1.2 vt", fill: "white" });
     this.view.position.x = 18;
