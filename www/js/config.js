@@ -4,6 +4,8 @@ const PLAYER_NUM = 4;
 const STATUS = {
   //配牌準備中
   INIT: 0,
+  //山札のデータをサーバから受信待ち
+  WAIT_DECK: 10,
   //ドラ表示中
   READY: 1,
   //配牌中
@@ -34,5 +36,4 @@ const CANVAS_WIDTH = 640;
 const CANVAS_HEIGHT = 920;
 const CENTER_X = 320;
 const CENTER_Y = 320;
-var drawing_count = 0;
 const CARD_SPEED = 15;

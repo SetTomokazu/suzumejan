@@ -10,17 +10,13 @@ var setBound = () => {
     case "Android":
     case "iPad":
     case "iPhone":
-      bound.height = screen.availHeight * (bound.width / screen.availWidth);
       bound.width = screen.availWidth * (bound.width / screen.availWidth);
+      bound.height = bound.width;
       bound.zoom = screen.availWidth / bound.width;
-      //console.log(JSON.stringify(bound));
-      //console.log(screen.availWidth + ',' + screen.availHeight);
-      //console.log(screen.width + ',' + screen.height);
       break;
     default:
-      bound.height = window.innerHeight;
       bound.width = window.innerWidth;
-      //bound.zoom = Math.Min(CANVAS_WIDTH / bound.width, CANVAS_HEIGHT / bound.height);
+      bound.height = bound.width;
       break;
   }
   return bound;

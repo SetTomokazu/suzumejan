@@ -4,6 +4,7 @@ class PixiObject {
   constructor() {
     this.view = null;//new PIXI.Text("PixiObject", { font: "36px/1.2 vt", fill: "white" });
     this.isMoving = false;
+    this.size = { h: 0, w: 0 };
     this.dest = { x: 0, y: 0 };
     this.speed = CARD_SPEED;
   }
@@ -33,6 +34,8 @@ class PixiObject {
   }
   //表示サイズ設定
   setSize(size) {
+    this.size.w = ('w' in size) ? size.w : this.view.width;
+    this.size.h = ('h' in size) ? size.h : this.view.height;
     this.view.width = ('w' in size) ? size.w : this.view.width;
     this.view.height = ('h' in size) ? size.h : this.view.height;
   }
@@ -49,10 +52,12 @@ class PixiObject {
   //毎フレームのアニメーション
   update(deltaTime) {
     if (this.isMoving) {
+      this.setSize(this.size);
       let scaler = this.speed / Math.sqrt(Math.pow(this.distanceX, 2) + Math.pow(this.distanceY, 2)) * deltaTime / 10;
       if (scaler > 1) {
         this.setPosition(this.dest);
         this.isMoving = false;
+        this.setSize(this.size);
       } else {
         this.view.position.x += this.distanceX * scaler;
         this.view.position.y += this.distanceY * scaler;

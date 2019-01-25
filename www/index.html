@@ -4,28 +4,31 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Monacanoid</title>
-	<meta name="viewport" content="target-densitydpi=device-dpi,width=320,maximum-scale=1,minimum-scale=1,user-scalable=no" />
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+	<script src="components/loader.js"></script>
+	<script src="components/monaca-jquery/jquery.cookie.js"></script>
 	<link rel="stylesheet" href="components/loader.css">
 	<link rel="stylesheet" href="css/style.css">
-	<script src="components/loader.js"></script>
 
-  <!-- PIXI.jsのコンポーネント -->
-  <script src="js/view/PixiDirector.js"></script>
-  <script src="js/view/PixiObject.js"></script>
-  <script src="js/view/PixiLabel.js"></script>
-  <script src="js/view/PixiImage.js"></script>
-  <script src="js/view/PixiGraphics.js"></script>
-  <script src="js/view/PixiButton.js"></script>
-  <script src="js/view/PixiDialogOKCancel.js"></script>
-  <script src="js/view/PixiDialogOK.js"></script>
-  <script src="js/view/PixiScoreResultDialog.js"></script>
-  <script src="js/view/PixiPai.js"></script>
+	<script src="https://suzumejan-server.herokuapp.com/socket.io/socket.io.js"></script>
+	<script src="js/socket.io.js"></script>
+	<!-- PIXI.jsのコンポーネント -->
+	<script src="js/view/PixiDirector.js"></script>
+	<script src="js/view/PixiObject.js"></script>
+	<script src="js/view/PixiLabel.js"></script>
+	<script src="js/view/PixiImage.js"></script>
+	<script src="js/view/PixiGraphics.js"></script>
+	<script src="js/view/PixiButton.js"></script>
+	<script src="js/view/PixiDialogOKCancel.js"></script>
+	<script src="js/view/PixiDialogOK.js"></script>
+	<script src="js/view/PixiScoreResultDialog.js"></script>
+	<script src="js/view/PixiPai.js"></script>
 
-  <!-- 自作クラス -->
+	<!-- 自作クラス -->
+	<script src="js/FrameSkipper.js"></script>
 	<script src="js/eventer/FinishDirector.js"></script>
-	<script src="js/eventer/InitExecuter.js"></script>
-	<script src="js/deck.js"></script>
+	<script src="js/Deck.js"></script>
 	<script src="js/data.js"></script>
 	<script src="js/PlayerManager.js"></script>
 	<script src="js/config.js"></script>
@@ -33,11 +36,41 @@
 	<script src="js/math.js"></script>
 	<script src="js/misc/calculator.js"></script>
 	<script src="js/Player.js"></script>
+	<script src="js/Account.js"></script>
 	<script src="js/status.js"></script>
 	<script src="js/events.js"></script>
+	<script src="js/suzumejan.js"></script>
+
+	<script>
+		ons.ready(function() {
+      console.log("Onsen UI is ready!");
+    });
+	</script>
 </head>
 
 <body>
+	<ons-navigator id="navigator" page="login.html"></ons-navigator>
+
+	<ons-template id="page1.html">
+		<ons-page id="page1">
+			<div class="content" style="text-align: center; padding-top:15px; padding-bottom:15px;">
+				<p>This is the first page.</p>
+				<ons-button id="push-button">Push page</ons-button>
+			</div>
+		</ons-page>
+	</ons-template>
+
+	<ons-template id="page2.html">
+		<ons-page id="page2">
+			<div style="padding-top:15px; padding-bottom:15px;">
+				<div class="content" style="text-align: center;">
+					<p>This is the second page.</p>
+					<ons-button id="pop-button">Pop page</ons-button>
+				</div>
+			</div>
+			<div class="stage" id="stage"></div>
+		</ons-page>
+	</ons-template>
 </body>
 
 </html>

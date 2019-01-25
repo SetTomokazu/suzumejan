@@ -1,21 +1,23 @@
 // This is a JavaScript file
 class PixiPai extends PixiObject {
-  constructor(card) {
+  constructor(cardId) {
     super();
     this.back = PIXI.Texture.fromImage("img/back.png", true);
-    this.front = PIXI.Texture.fromImage(card.img, true);
+    this.front = PIXI.Texture.fromImage(Base[cardId].img, true);
     this.view = new PIXI.Sprite(this.back);
     super.setCenter();
-    this.data = Number(card.data);
-    this.dora = Number(card.dora);
-    
+    this.id = cardId;
+    this.data = Number(Base[cardId].data);
+    this.dora = Number(Base[cardId].dora);
   }
 
   faceUp() {
     this.view.texture = this.front;
+    this.setSize(this.size)
   }
 
   faceDown() {
     this.view.texture = this.back;
+    this.setSize(this.size)
   }
 }

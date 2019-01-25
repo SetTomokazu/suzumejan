@@ -1,5 +1,5 @@
 //点数取得
-const calc = (idx, hands) => {
+const calc = (hands) => {
   var cards = hands.concat();
   var result = {
     detail: [],
@@ -84,10 +84,6 @@ const calc = (idx, hands) => {
       break;
     default:
       break;
-  }
-  if (idx == PM.currentIdx) {
-    result.detail.push("親:2点");
-    result.score += 2;
   }
   return result;
 }
