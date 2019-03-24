@@ -30,10 +30,10 @@ const STATUS = {
 
 const IMAGE_WIDTH = 66;
 const IMAGE_HEIGHT = 90;
-const IMAGE_SCALE = 0.8;
-const IMAGE_SCALE_DISCARD = 0.4;
+const IMAGE_SCALE = 0.5;
+const IMAGE_SCALE_DISCARD = 0.3;
 const CANVAS_WIDTH = 640;
 const CANVAS_HEIGHT = 920;
 const CENTER_X = 320;
 const CENTER_Y = 320;
-const CARD_SPEED = 15;
+const CARD_SPEED = 30;

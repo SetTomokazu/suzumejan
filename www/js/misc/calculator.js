@@ -1,5 +1,5 @@
 //点数取得
-const calc = (hands) => {
+const calc = (hands, dora) => {
   var cards = hands.concat();
   var result = {
     detail: [],
@@ -28,7 +28,7 @@ const calc = (hands) => {
   }
 
   //表示ドラ加算
-  let dora = cards.filter(x => Number(x.data) === Number(deck.dora.data)).length;
+  let doraCount = cards.filter(x => Number(x.data) === Number(dora)).length;
   if (Number(dora) > 0) {
     result.score += Number(dora);
     result.detail.push("ドラ:" + Number(dora) + "点");
@@ -131,4 +131,94 @@ const spliceAt = (ary, data) => {
     }
   }
   return ary;
+}
+
+
+const calcScore = (hands, dora) => {
+  var cards = hands.concat();
+  var result = {
+    detail: [],
+    score: 0
+  }
+  cards.sort((a, b) => a.data - b.data);
+  //メンツができてなければ終わり
+  if (isTempai(cards) == false) return result;
+  //スーパーレッド判定
+  if (cards.filter(x => Number(x.dora) == 1).length == 6) {
+    result.score = 20;
+    result.detail.push({ name: "スーパーレッド", score: 20 });
+    return result;
+  }
+  //オールグリーン判定
+  if (cards.filter(x => Number(x.dora) == 0 && AllGrean.indexOf(Number(x.data)) > -1).length == 6) {
+    result.score = 10;
+    result.detail.push({ name: "オールグリーン", score: 10 });
+    return result;
+  }
+  //チンヤオ判定
+  if (cards.filter(x => Number(x.data) == 1 || 9 <= Number(x.data)).length == 6) {
+    result.score = 15;
+    result.detail.push({ name: "チンヤオ", score: 15 });
+    return result;
+  }
+
+  //表示ドラ加算
+  let doraLength = cards.filter(x => Number(x.data) === Number(deck.dora.data)).length;
+  if (Number(doraLength) > 0) {
+    result.score += Number(doraLength);
+    result.detail.push("ドラ:" + Number(doraLength) + "点");
+  }
+  //赤ドラ加算
+  let akadora = cards.filter(x => Number(x.dora) === 1).length;
+  if (Number(akadora) > 0) {
+    result.score += Number(akadora);
+    result.detail.push("赤ドラ:" + Number(akadora) + "点");
+  }
+
+  let chanta_count = 0;
+  for (let i = 1; i < 12; i++) {
+    if (cards.filter(x => Number(x.data) == i).length >= 3) {
+      result.score += 2;
+      cards = spliceAt(cards, i);
+      cards = spliceAt(cards, i);
+      cards = spliceAt(cards, i);
+      result.detail.unshift("刻子:2点");
+      if (i == 1 || 9 <= i) {
+        chanta_count++;
+      }
+    }
+  }
+  for (let i = 1; i <= 7; i++) {
+    for (let x = 2; x >= 1; x--) {
+      if (cards.filter(x => Number(x.data) == Number(i)).length >= x &&
+        cards.filter(x => Number(x.data) == Number(i) + 1).length >= x &&
+        cards.filter(x => Number(x.data) == Number(i) + 2).length >= x
+      ) {
+        result.score += x;
+        result.detail.unshift("順子:1点");
+        cards = spliceAt(cards, i);
+        cards = spliceAt(cards, i + 1);
+        cards = spliceAt(cards, i + 2);
+        if (i == 1 || i == 7) {
+          chanta_count += x;
+        }
+        break;
+      }
+    }
+  }
+  switch (chanta_count) {
+    case 0://タンヤオ
+      result.detail.push("タンヤオ:1点");
+      result.score += 1;
+      break;
+    case 1:
+      break;
+    case 2://チャンタ
+      result.detail.push("チャンタ:2点");
+      result.score += 2;
+      break;
+    default:
+      break;
+  }
+  return result;
 }

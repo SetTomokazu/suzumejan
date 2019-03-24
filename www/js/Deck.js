@@ -9,11 +9,11 @@ class Deck {
   init(ary) {
     this.clear();
     this.deck = [];
-    let first_pos = { x: CENTER_X + 0.55 * IMAGE_WIDTH * IMAGE_SCALE, y: CENTER_Y };
+    let first_pos = { x: PD.CanvasWidth * 0.6, y: PD.CanvasHeightCenter };
+    console.log(JSON.stringify(first_pos));
     for (let t of ary) {
       var p = new PixiPai(t.id);
-      p.setPosition(first_pos);
-      p.setSize({ w: IMAGE_WIDTH * IMAGE_SCALE, h: IMAGE_HEIGHT * IMAGE_SCALE });
+      p.setPosition(first_pos.x, first_pos.y);
       p.show();
       this.deck.push(p);
     }
@@ -29,7 +29,7 @@ class Deck {
 
   setDora() {
     this.dora = this.next;
-    this.dora.setDest({ x: CENTER_X - 0.55 * IMAGE_WIDTH * IMAGE_SCALE, y: CENTER_Y });
+    this.dora.setDest(PD.CanvasWidth * 0.4, PD.CanvasHeightCenter);
     this.dora.faceUp();
     console.log(JSON.stringify(this.dora.size));
   }

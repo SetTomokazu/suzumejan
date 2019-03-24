@@ -72,6 +72,12 @@ class PlayerManager {
     this.idx = (this.idx + 1) % PLAYER_NUM;
   }
 
+  // ドラをプレイヤーに告知する
+  announceDora(dora) {
+    for (let p of this.players) {
+      p.dora = dora;
+    }
+  }
   sort() {
     for (let p of this.players) {
       p.sort();

@@ -10,7 +10,8 @@ class Player {
     this.request = 0;
     this.scoreLabel = new PixiLabel(this.playerName + " : " + this.total_score);
     this.scoreLabel.setRotation(this.rot);
-    this.scoreLabel.setPosition(getScorePos(this.rot));
+    let p = getScorePos(this.rot);
+    this.scoreLabel.setPosition(p.x, p.y);
     this.scoreLabel.show();
 
     this.result = null;
@@ -30,9 +31,12 @@ class Player {
   draw(card) {
     this.hand.push(card);
     card.setRotation(this.rot);
-    card.setDest(this.getHandsPos(this.hand.length - 1));
+    let p = this.getHandsPos(this.hand.length - 1);
+    card.setDest(p.x, p.y);
     if (this.idx === 0) {
       //自キャラ(一番下の人)の場合手牌を見せる
+      card.faceUp();
+    } else {
       card.faceUp();
     }
   }
@@ -44,7 +48,7 @@ class Player {
   //自摸判定もここで行う
   start2Select() {
     this.hasSelectedAct = false;
-    this.result = calc(this.hand);
+    this.result = calc(this.hand, this.dora.data);
     if (this.idx == 0) {
       //手牌選択可能にする
       this.setHandsActive(true);
@@ -116,8 +120,8 @@ class Player {
     let card = this.hand[idx];
     this.hand.splice(idx, 1);
     var pos = this.getNextDiscardPos();
-    card.setDest(pos);
-    card.setSize(this.WASTE_CARD_SIZE);
+    card.setDest(pos.x, pos.y);
+    card.setSizeSmall();
     card.faceUp();
     this.discard.push(card);
     this.sort();
@@ -151,7 +155,9 @@ class Player {
   }
 
   action(card) {
-    this.result = calc(this.hand, card);
+    let temp = this.hand.concat();
+    temp.push(card);
+    this.result = calc(temp, this.dora.data);
     if (this.idx == 0) {
       if (this.result.score >= 5) {
         let str = "";
@@ -175,27 +181,29 @@ class Player {
   sort() {
     //sortする時点で手番は一通り終わっている
     this.result = null;
-    this.hand.sort((a, b) => a.data - b.data);
+    this.hand.sort((a, b) => a.id - b.id);
     for (let i in this.hand) {
-      this.hand[i].setDest(this.getHandsPos(i));
+      let p = this.getHandsPos(i);
+      this.hand[i].setDest(p.x, p.y);
     }
   }
 
   getHandsPos(idx) {
     let pos = {};
-    let x = (-2 + Number(((idx < 5) ? idx : idx + 0.3))) * IMAGE_WIDTH * IMAGE_SCALE;
-    let y = 250;
-    pos.x = x * Math.cos(this.rot) - (y * Math.sin(this.rot)) + CENTER_X;
-    pos.y = x * Math.sin(this.rot) + (y * Math.cos(this.rot)) + CENTER_Y;
+    let x = (-2 + Number(((idx < 5) ? idx : idx + 0.3))) * PixiPai.normalWidth;
+    let y = PD.CanvasWidthCenter * 0.6;
+    pos.x = x * Math.cos(this.rot) - (y * Math.sin(this.rot)) + PD.CanvasWidthCenter;
+    pos.y = x * Math.sin(this.rot) + (y * Math.cos(this.rot)) + PD.CanvasHeightCenter;
     return pos;
   }
+
   getNextDiscardPos() {
     let idx = this.discard.length;
     var pos = {};
-    let x = (-3 + Number(idx) % 6) * IMAGE_WIDTH * IMAGE_SCALE_DISCARD;
-    let y = 100 + Math.floor(idx / 6) * IMAGE_HEIGHT * IMAGE_SCALE_DISCARD;
-    pos.x = x * Math.cos(this.rot) - (y * Math.sin(this.rot)) + CENTER_X;
-    pos.y = x * Math.sin(this.rot) + (y * Math.cos(this.rot)) + CENTER_Y;
+    let x = (-3 + Number(idx) % 6) * PixiPai.smallWidth;
+    let y = PD.CanvasWidthCenter * 0.4 + Math.floor(idx / 6) * PixiPai.smallHeight;
+    pos.x = x * Math.cos(this.rot) - (y * Math.sin(this.rot)) + PD.CanvasWidthCenter;
+    pos.y = x * Math.sin(this.rot) + (y * Math.cos(this.rot)) + PD.CanvasHeightCenter;
     return pos;
   }
 
@@ -205,8 +213,8 @@ class Player {
 const getScorePos = (rot) => {
   var pos = {};
   let x = IMAGE_WIDTH * IMAGE_SCALE_DISCARD;
-  let y = 200;
-  pos.x = x * Math.cos(rot) - (y * Math.sin(rot)) + CENTER_X;
-  pos.y = x * Math.sin(rot) + (y * Math.cos(rot)) + CENTER_Y;
+  let y = PD.CanvasWidthCenter * 0.8;
+  pos.x = x * Math.cos(rot) - (y * Math.sin(rot)) + PD.CanvasWidthCenter;
+  pos.y = x * Math.sin(rot) + (y * Math.cos(rot)) + PD.CanvasHeightCenter;
   return pos;
 }

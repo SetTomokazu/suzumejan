@@ -28,22 +28,21 @@ class PixiObject {
     this.view.rotation = rot;
   }
   //座標設定
-  setPosition(pos) {
-    if ('x' in pos) { this.view.position.x = pos.x; }
-    if ('y' in pos) { this.view.position.y = pos.y; }
+  setPosition(x, y) {
+    this.view.position.set(x, y);
   }
   //表示サイズ設定
-  setSize(size) {
-    this.size.w = ('w' in size) ? size.w : this.view.width;
-    this.size.h = ('h' in size) ? size.h : this.view.height;
-    this.view.width = ('w' in size) ? size.w : this.view.width;
-    this.view.height = ('h' in size) ? size.h : this.view.height;
+  setSize(w, h) {
+    this.size.w = w;
+    this.size.h = h;
+    this.view.width = w;
+    this.view.height = h;
   }
 
   //移動先設定
-  setDest(pos) {
-    this.dest.x = ('x' in pos) ? pos.x : this.view.position.x;
-    this.dest.y = ('y' in pos) ? pos.y : this.view.position.y;
+  setDest(x, y) {
+    this.dest.x = x;
+    this.dest.y = y;
     this.isMoving = true;
   }
 
@@ -52,12 +51,10 @@ class PixiObject {
   //毎フレームのアニメーション
   update(deltaTime) {
     if (this.isMoving) {
-      this.setSize(this.size);
-      let scaler = this.speed / Math.sqrt(Math.pow(this.distanceX, 2) + Math.pow(this.distanceY, 2)) * deltaTime / 10;
+      let scaler = this.speed / Math.sqrt(Math.pow(this.distanceX, 2) + Math.pow(this.distanceY, 2)) * deltaTime / 100;
       if (scaler > 1) {
-        this.setPosition(this.dest);
+        this.setPosition(this.dest.x, this.dest.y);
         this.isMoving = false;
-        this.setSize(this.size);
       } else {
         this.view.position.x += this.distanceX * scaler;
         this.view.position.y += this.distanceY * scaler;
@@ -66,15 +63,13 @@ class PixiObject {
   }
   //タップ時の関数登録
   setFunc(func) {
-    this.view.click = this.view.tap = func;
+    this.view.on("pointerdown", func);
   }
   //ボタン有効設定
   setActive(b) {
-    this.setButtonEnable(b);
+    // カーソルを変化させるフラグのため、スマホでは特に不要な項目
+    //this.view.buttonMode = b;
+    // ボタンの有効化
     this.view.interactive = b;
-  }
-  //ボタンとして使うかどうかの設定
-  setButtonEnable(b) {
-    this.view.buttonMode = b;
   }
 }

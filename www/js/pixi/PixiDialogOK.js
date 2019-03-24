@@ -8,7 +8,7 @@ class PixiDialogOK {
     this.controls.push(bg);
 
     let ok = new PixiLabel(word);
-    ok.setPosition({ x: CENTER_X, y: CENTER_X });
+    ok.setPosition({ x: PD.CanvasWidthCenter, y: PD.CanvasHeightCenter });
 
     ok.setFunc(() => {
       this.dialogResult = PixiDialogOK.DialogOK;

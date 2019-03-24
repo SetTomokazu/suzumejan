@@ -1,6 +1,5 @@
 //表示しているPixiObjectとその動きの管理
 class Suzumejan {
-
   constructor() {
     this.items = [];
     this.init();
@@ -8,8 +7,8 @@ class Suzumejan {
     this.state = 'waiting2EnterRoom';
     this.PM = new PlayerManager();
     this.roomId = 0;
-    this.turn = 0;
-    this.serverTurn = 0;
+    this.turn = -1;
+    this.serverTurn = -1;
     this.event = null;
     this.skipper = new FrameSkipper();
   }
@@ -24,10 +23,12 @@ class Suzumejan {
     socket.on('action', this.doAction.bind(this));
     socket.on('reaction', this.doReaction.bind(this));
     socket.on('ready2Draw', this.doNextDraw.bind(this));
+
     socket.emit('startTraining', account);
   }
 
   send(event, detail = {}) {
+    console.log('send ' + event + ':' + JSON.stringify(detail));
     socket.emit(event, { roomId: account.roomId, playerName: account.playerName, detail: detail });
   }
 
@@ -50,6 +51,7 @@ class Suzumejan {
           this.PM.current().draw(this.deck.next);
           this.PM.step();
           if (this.PM.isDoneFirstDealing) {
+            this.PM.announceDora(this.deck.dora);
             this.state = 'waitingFirstDealing';
           } else {
             this.skipper.init(5);
@@ -81,7 +83,7 @@ class Suzumejan {
             console.log("流局");
             this.dialog = new PixiDialogOK("流局");
             this.dialog.show();
-            this.state = STATUS.RYUKYOKU;
+            this.state = '流局';
           }
         }
         break;
@@ -99,7 +101,8 @@ class Suzumejan {
         }
         break;
       case 'wait2ReceiveAction':
-        if (this.event != null) {
+        // 描画完了は待つ
+        if (PD.hasMoved && this.event != null) {
           switch (this.event.action) {
             case 'waste':
               this.PM.current().waste(this.event.id);
@@ -133,6 +136,8 @@ class Suzumejan {
             this.send('ready2Draw');
             this.state = 'dealing';
           } else {
+
+            this.PM.step();
             console.log('dada');
             this.state = 'dealing';
           }
@@ -160,33 +165,34 @@ class Suzumejan {
           this.state = STATUS.INIT;
         }
         break;
-      case STATUS.RYUKYOKU:
-        //OK承認待ち
-        if (dialog.dialogResult == PixiDialogOK.DialogOK) {
-          exec.init.init();
-          this.state = STATUS.INIT;
-        }
+      case '流局':
+        // サーバからの状態遷移待ち
         break;
       default:
         break;
     }
   }
 
+
+
   initRoomAndMembers(data) {
-    console.log(JSON.stringify(data));
+    console.log('initRoomAndMembers:' + JSON.stringify(data));
     this.roomId = data.roomId;
     account.roomId = data.roomId;
     this.PM.initMembers(account.playerName, data.members);
+    PD.beforeUpdate.game = this.update.bind(this);
   }
   initDeck(data) {
+    console.log('initDeck:' + JSON.stringify(data));
     this.deck.init(data.deck);
   }
   doNextDraw(data) {
+    console.log('initDeck:' + JSON.stringify(data));
     this.serverTurn = data.turn;
     console.log('第' + data.turn + 'ツモっていいってよ！');
   }
   doAction(data) {
-    console.log(JSON.stringify(data));
+    console.log('doAction:' + JSON.stringify(data));
     if (this.PM.current().playerName === data.playerName) {
       console.log(data.playerName + 'さんが' + data.id + 'を捨てるそうです');
       this.event = data;
@@ -195,7 +201,19 @@ class Suzumejan {
     }
   }
   doReaction(data) {
-    console.log(JSON.stringify(data));
+    console.log('doReaction:' + JSON.stringify(data));
     this.event = data;
+    if (this.event.every(e => e.reaction === 'pass')) {
+      this.PM.step();
+      this.send('ready2Draw');
+      this.state = 'dealing';
+    } else {
+
+      this.PM.step();
+      console.log('dada');
+      this.state = 'dealing';
+    }
+
   }
+
 }
