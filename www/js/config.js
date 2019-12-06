@@ -36,4 +36,4 @@ const CANVAS_WIDTH = 640;
 const CANVAS_HEIGHT = 920;
 const CENTER_X = 320;
 const CENTER_Y = 320;
-const CARD_SPEED = 30;
+const CARD_SPEED = 60;

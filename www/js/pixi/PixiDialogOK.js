@@ -3,15 +3,16 @@ class PixiDialogOK {
 
   constructor(word, callback) {
     this.controls = [];
+    this.callback = callback;
     this.dialogResult = -1;
     let bg = new PixiGraphics();
     this.controls.push(bg);
 
     let ok = new PixiLabel(word);
-    ok.setPosition({ x: PD.CanvasWidthCenter, y: PD.CanvasHeightCenter });
+    ok.setPosition(PD.CanvasWidthCenter, PD.CanvasHeightCenter);
 
     ok.setFunc(() => {
-      this.dialogResult = PixiDialogOK.DialogOK;
+      this.callback();
       this.hide();
     });
     ok.setActive(true);

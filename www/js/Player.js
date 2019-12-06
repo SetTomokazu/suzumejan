@@ -9,18 +9,19 @@ class Player {
     this.discard = [];
     this.request = 0;
     this.scoreLabel = new PixiLabel(this.playerName + " : " + this.total_score);
-    this.scoreLabel.setRotation(this.rot);
     let p = getScorePos(this.rot);
     this.scoreLabel.setPosition(p.x, p.y);
+    this.scoreLabel.setRotation(this.rot);
     this.scoreLabel.show();
 
     this.result = null;
 
     this.hasSelectedAct = false;
-    this.act = null;
   }
 
   reset() {
+    for (let c of this.hand) c.hide();
+    for (let d of this.discard) d.hide();
     this.hand = [];
     this.discard = [];
   }
@@ -28,17 +29,12 @@ class Player {
     this.total_score += parseInt(val);
     this.scoreLabel.setText(this.playerName + " : " + this.total_score);
   }
-  draw(card) {
+  draw(card, delay = 0) {
+
     this.hand.push(card);
     card.setRotation(this.rot);
     let p = this.getHandsPos(this.hand.length - 1);
-    card.setDest(p.x, p.y);
-    if (this.idx === 0) {
-      //自キャラ(一番下の人)の場合手牌を見せる
-      card.faceUp();
-    } else {
-      card.faceUp();
-    }
+    card.setDest(p.x, p.y, delay);
   }
   pass() {
     this.result.score = 0;
@@ -46,25 +42,24 @@ class Player {
 
   //手牌選択開始
   //自摸判定もここで行う
-  start2Select() {
+  start2Select(callback) {
+    if (this.idx === 0) {
+      //自キャラ(一番下の人)の場合手牌を見せる
+      for (let card of this.hand) { card.faceUp(); }
+    } else {
+      for (let card of this.hand) { card.faceUp(); }
+    }
     this.hasSelectedAct = false;
     this.result = calc(this.hand, this.dora.data);
-    if (this.idx == 0) {
-      //手牌選択可能にする
-      this.setHandsActive(true);
-      if (this.result.score >= 5) {
-        this.selectedAction = -1;
-        this.dialog = new PixiDialogOKCancel("和了", this);
-        this.dialog.show();
-      }
-    } else {
-      //CPUの場合
-      if (this.result.score >= 5) {
-        this.selectedAction = 1;//ツモ
-      } else {
-        //ランダムで捨て牌決定
-        this.selectedIdx = Math.floor(Math.random() * 6);
-      }
+
+    //手牌選択可能にする
+    this.setHandsActive(true, callback);
+    if (this.result.score >= 5) {
+      this.dialog = new PixiDialogOKCancel(
+        "和了",
+        () => { callback({ 'action': 'tsumo', 'user': this.playerName }); },
+        () => { });
+      this.dialog.show();
     }
   }
   open() {
@@ -82,39 +77,6 @@ class Player {
   }
   get WASTE_CARD_SIZE() { return { w: IMAGE_WIDTH * IMAGE_SCALE_DISCARD, h: IMAGE_HEIGHT * IMAGE_SCALE_DISCARD } }
 
-  //自ターン時に常に呼ばれる状態管理者
-  turn() {
-    let result = false;
-    switch (this.selectedAction) {
-      case -1:
-        //行動未選択の為待機中
-        break;
-
-      case PixiDialogOKCancel.DialogNG://キャンセル
-        if (this.selectedIdx >= 0) {
-          let card = this.hand[this.selectedIdx];
-          this.hand.splice(this.selectedIdx, 1);
-          var pos = getDiscardPos(this.discard.length, this.rot);
-          card.setDest(pos);
-          card.setSize(this.WASTE_CARD_SIZE);
-          card.faceUp();
-          waste = card;
-          this.discard.push(card);
-          result = true;
-        }
-        break;
-
-      case PixiDialogOKCancel.DialogOK: //ツモ
-        for (let c of this.hand) {
-          c.interactive = false;
-        }
-        result = true;
-        break;
-      default:
-        break;
-    }
-    return result;
-  }
   waste(id) {
     let idx = this.hand.findIndex(c => c.id === id);
     let card = this.hand[idx];
@@ -126,16 +88,25 @@ class Player {
     this.discard.push(card);
     this.sort();
   }
+
   //ユーザ入力によって選択された捨て牌
   select(obj) {
+    console.log("select");
+    if (this.hasSelectedAct) return;
+    this.hasSelectedAct = true;
     this.setHandsActive(false);
     this.selectedIdx = this.hand.findIndex(h => h === obj);
-    this.hasSelectedAct = true;
     this.act = { action: 'waste', user: this.playerName, id: obj.id };
+    if (this.callback !== undefined) {
+      this.callback({ 'action': 'waste', 'user': this.playerName, 'id': obj.id });
+      this.callback = undefined;
+    }
   }
-  setHandsActive(b) {
+
+  setHandsActive(b, callback = undefined) {
     if (b) {
       for (let i in this.hand) {
+        this.callback = callback;
         this.hand[i].setFunc(this.select.bind(this, this.hand[i]));
         this.hand[i].setActive(true);
       }
@@ -145,9 +116,9 @@ class Player {
       }
     }
   }
+
   setDialogResult(r) {
     this.selectedAction = r;
-    vote++;
     if (this.selectedAction == PixiDialogOKCancel.DialogNG) {
       //キャンセルの場合は点数計算結果を破棄する
       this.pass();
@@ -191,7 +162,7 @@ class Player {
   getHandsPos(idx) {
     let pos = {};
     let x = (-2 + Number(((idx < 5) ? idx : idx + 0.3))) * PixiPai.normalWidth;
-    let y = PD.CanvasWidthCenter * 0.6;
+    let y = PD.CanvasWidthCenter * 0.81;
     pos.x = x * Math.cos(this.rot) - (y * Math.sin(this.rot)) + PD.CanvasWidthCenter;
     pos.y = x * Math.sin(this.rot) + (y * Math.cos(this.rot)) + PD.CanvasHeightCenter;
     return pos;

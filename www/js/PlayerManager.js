@@ -8,10 +8,11 @@ class PlayerManager {
     this.idx = 0;
     this.oya = -1;
   }
-  get currentIdx() { return this.idx; }
+  get currentIdx() { return (this.idx + this.oya) % 4; }
   get isReady() { return this.players.length === 4; }
   get isDoneFirstDealing() { return this.players.every(p => p.hand.length === 5); }
-  init() {
+
+  nextGame() {
     this.oya++;
     this.oya %= PLAYER_NUM;
     this.idx = this.oya;
@@ -19,6 +20,7 @@ class PlayerManager {
       p.reset();
     }
   }
+
   initMembers(myName, members) {
     this.players = [];
     console.log('initMembers of' + myName);
@@ -28,6 +30,7 @@ class PlayerManager {
         this.players.push(new Player(members.find(m => m.sheet === 'south').name, 1));
         this.players.push(new Player(members.find(m => m.sheet === 'west').name, 2));
         this.players.push(new Player(members.find(m => m.sheet === 'north').name, 3));
+        this.oya = 0;
         console.log('東');
         break;
       case members.find(m => m.sheet === 'south').name === myName:
@@ -35,6 +38,7 @@ class PlayerManager {
         this.players.push(new Player(members.find(m => m.sheet === 'south').name, 0));
         this.players.push(new Player(members.find(m => m.sheet === 'west').name, 1));
         this.players.push(new Player(members.find(m => m.sheet === 'north').name, 2));
+        this.oya = 3;
         console.log('南');
         break;
       case members.find(m => m.sheet === 'west').name === myName:
@@ -42,6 +46,7 @@ class PlayerManager {
         this.players.push(new Player(members.find(m => m.sheet === 'south').name, 3));
         this.players.push(new Player(members.find(m => m.sheet === 'west').name, 0));
         this.players.push(new Player(members.find(m => m.sheet === 'north').name, 1));
+        this.oya = 2;
         console.log('西');
         break;
       case members.find(m => m.sheet === 'north').name === myName:
@@ -49,17 +54,21 @@ class PlayerManager {
         this.players.push(new Player(members.find(m => m.sheet === 'south').name, 2));
         this.players.push(new Player(members.find(m => m.sheet === 'west').name, 3));
         this.players.push(new Player(members.find(m => m.sheet === 'north').name, 0));
+        this.oya = 1;
         console.log('北');
         break;
       default:
         break;
     }
-    this.idx = 0;
+
+    this.idx = this.oya;
   }
 
   //現在のプレイヤーを取得する
   current() {
-    return this.players[this.idx];
+    let i = (this.idx + this.oya) % PLAYER_NUM;
+    console.log(i);
+    return this.players[i];
   }
   me() {
     return this.players.find(p => p.playerName === account.playerName);
@@ -70,6 +79,7 @@ class PlayerManager {
   //プレイヤーを次に進める
   step() {
     this.idx = (this.idx + 1) % PLAYER_NUM;
+    console.log("idx:" + this.idx);
   }
 
   // ドラをプレイヤーに告知する

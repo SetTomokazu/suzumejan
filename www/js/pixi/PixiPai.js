@@ -14,8 +14,8 @@ class PixiPai extends PixiObject {
 
   static get OriginalWidth() { return 66; }
   static get OriginalHeight() { return 90; }
-  static get normalWidth() { return PixiPai.OriginalWidth * 0.5; }
-  static get normalHeight() { return PixiPai.OriginalHeight * 0.5; }
+  static get normalWidth() { return PixiPai.OriginalWidth * 0.7; }
+  static get normalHeight() { return PixiPai.OriginalHeight * 0.7; }
   static get smallWidth() { return PixiPai.OriginalWidth * 0.3; }
   static get smallHeight() { return PixiPai.OriginalHeight * 0.3; }
   setSizeNomal() { this.setSize(PixiPai.normalWidth, PixiPai.normalHeight); }
